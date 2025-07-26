@@ -6,7 +6,7 @@ import {
   Edit3, Trash2, User, TrendingUp, TrendingDown,
   CheckCircle, AlertCircle, Info
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const TripDetails = () => {
@@ -30,8 +30,8 @@ const TripDetails = () => {
   const fetchTripDetails = async () => {
     try {
       const [tripResponse, balancesResponse] = await Promise.all([
-        axios.get(`/api/trips/${id}`),
-        axios.get(`/api/trips/${id}/balances`)
+        api.get(`/api/trips/${id}`),
+        api.get(`/api/trips/${id}/balances`)
       ]);
       setTrip(tripResponse.data);
       setBalances(balancesResponse.data);
@@ -52,7 +52,7 @@ const TripDetails = () => {
     }
 
     try {
-      await axios.post(`/api/trips/${id}/expenses`, newExpense);
+      await api.post(`/api/trips/${id}/expenses`, newExpense);
       toast.success('Expense added successfully!');
       setNewExpense({ description: '', amount: '', paidBy: '' });
       setShowAddExpense(false);
@@ -71,7 +71,7 @@ const TripDetails = () => {
     }
 
     try {
-      await axios.put(`/api/trips/${id}/expenses/${editingExpense.index}`, {
+      await api.put(`/api/trips/${id}/expenses/${editingExpense.index}`, {
         description: editingExpense.description,
         amount: editingExpense.amount,
         paidBy: editingExpense.paidBy
@@ -87,7 +87,7 @@ const TripDetails = () => {
   const handleDeleteExpense = async (index) => {
     if (window.confirm('Are you sure you want to delete this expense?')) {
       try {
-        await axios.delete(`/api/trips/${id}/expenses/${index}`);
+        await api.delete(`/api/trips/${id}/expenses/${index}`);
         toast.success('Expense deleted successfully!');
         fetchTripDetails();
       } catch (error) {

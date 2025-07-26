@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, X, Users, MapPin, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const CreateTrip = () => {
@@ -64,7 +64,7 @@ const CreateTrip = () => {
     setLoading(true);
     
     try {
-      const response = await axios.post('/api/trips', {
+      const response = await api.post('/api/trips', {
         name: formData.name.trim(),
         participants: validParticipants
       });

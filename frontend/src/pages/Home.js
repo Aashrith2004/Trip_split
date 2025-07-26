@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Users, DollarSign, Calendar, ArrowRight, MapPin } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const Home = () => {
@@ -15,7 +15,7 @@ const Home = () => {
 
   const fetchTrips = async () => {
     try {
-      const response = await axios.get('/api/trips');
+      const response = await api.get('/api/trips');
       setTrips(response.data);
     } catch (error) {
       toast.error('Failed to load trips');
