@@ -22,6 +22,8 @@ const TripDetails = () => {
     amount: '',
     paidBy: ''
   });
+  const [showAddParticipant, setShowAddParticipant] = useState(false);
+  const [newParticipant, setNewParticipant] = useState('');
 
   useEffect(() => {
     fetchTripDetails();
@@ -93,6 +95,24 @@ const TripDetails = () => {
       } catch (error) {
         toast.error('Failed to delete expense');
       }
+    }
+  };
+
+  // Handler to add participant
+  const handleAddParticipant = async (e) => {
+    e.preventDefault();
+    if (!newParticipant.trim()) {
+      toast.error('Please enter a participant name');
+      return;
+    }
+    try {
+      await api.post(`/api/trips/${id}/participants`, { participant: newParticipant.trim() });
+      toast.success('Participant added!');
+      setNewParticipant('');
+      setShowAddParticipant(false);
+      fetchTripDetails();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to add participant');
     }
   };
 
@@ -239,7 +259,15 @@ const TripDetails = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Participants</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Participants</h3>
+              <button
+                onClick={() => setShowAddParticipant(true)}
+                className="btn-outline text-sm px-3 py-1"
+              >
+                <Plus className="h-4 w-4 mr-1 inline" /> Add
+              </button>
+            </div>
             <div className="space-y-2">
               {trip.participants.map((participant, index) => (
                 <div key={index} className="flex items-center space-x-2">
@@ -451,6 +479,54 @@ const TripDetails = () => {
                   </button>
                   <button type="submit" className="flex-1 btn-primary">
                     Update Expense
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add Participant Modal */}
+      <AnimatePresence>
+        {showAddParticipant && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white rounded-xl p-6 w-full max-w-md"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Participant</h3>
+              <form onSubmit={handleAddParticipant} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newParticipant}
+                    onChange={(e) => setNewParticipant(e.target.value)}
+                    className="input-field"
+                    placeholder="Enter participant name"
+                    required
+                  />
+                </div>
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddParticipant(false)}
+                    className="flex-1 btn-outline"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="flex-1 btn-primary">
+                    Add
                   </button>
                 </div>
               </form>
