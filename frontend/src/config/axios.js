@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Replace this URL with your actual Vercel backend URL
-const API_BASE_URL = 'https://trip-split-backend.vercel.app';
+const API_BASE_URL = 'https://trip-split-backend.vercel.app/api';
 
 // Create axios instance with base URL
 const api = axios.create({
