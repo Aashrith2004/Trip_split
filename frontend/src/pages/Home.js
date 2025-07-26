@@ -97,7 +97,6 @@ const Home = () => {
           </motion.button>
         </Link>
       </motion.div>
-
       {/* Trips Section */}
       <motion.div
         variants={containerVariants}
@@ -123,12 +122,12 @@ const Home = () => {
               <p className="text-gray-600 mb-6">
                 Create your first trip to start splitting expenses with friends and family.
               </p>
-              <Link to="/create">
+              {/* <Link to="/create">
                 <button className="btn-primary">
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Trip
                 </button>
-              </Link>
+              </Link> */}
             </div>
           </motion.div>
         ) : (
