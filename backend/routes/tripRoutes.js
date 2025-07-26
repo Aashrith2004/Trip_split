@@ -187,6 +187,29 @@ router.delete("/:tripId/expenses/:expenseIndex", async (req, res) => {
   }
 });
 
+// Add a participant to a trip
+router.post('/:id/participants', async (req, res) => {
+  try {
+    const { participant } = req.body;
+    if (!participant || participant.trim() === "") {
+      return res.status(400).json({ error: "Participant name is required" });
+    }
+    const trip = await Trip.findById(req.params.id);
+    if (!trip) return res.status(404).json({ error: "Trip not found" });
+
+    // Prevent duplicate participants
+    if (trip.participants.includes(participant.trim())) {
+      return res.status(400).json({ error: "Participant already exists" });
+    }
+
+    trip.participants.push(participant.trim());
+    await trip.save();
+    res.json(trip);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Delete a trip by ID
 router.delete('/:id', async (req, res) => {
   try {
