@@ -187,4 +187,17 @@ router.delete("/:tripId/expenses/:expenseIndex", async (req, res) => {
   }
 });
 
+// Delete a trip by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const trip = await Trip.findByIdAndDelete(req.params.id);
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found' });
+    }
+    res.json({ message: 'Trip deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
