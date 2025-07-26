@@ -151,7 +151,7 @@ const TripDetails = () => {
               </div>
               <div className="flex items-center">
                 <Calculator className="h-4 w-4 mr-1" />
-                Total: ${totalExpenses.toFixed(2)}
+                Total: ₹{totalExpenses.toFixed(2)}
               </div>
             </div>
           </div>
@@ -207,7 +207,7 @@ const TripDetails = () => {
                       <p className="text-sm text-gray-600">Paid by {expense.paidBy}</p>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <span className="font-semibold text-gray-900">${expense.amount.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-900">₹{expense.amount.toFixed(2)}</span>
                       <div className="flex space-x-1">
                         <button
                           onClick={() => setEditingExpense({ ...expense, index })}
@@ -274,7 +274,7 @@ const TripDetails = () => {
                         <CheckCircle className="h-4 w-4" />
                       )}
                       <span className="font-medium">
-                        {balance > 0 ? '+' : ''}${balance.toFixed(2)}
+                        {balance > 0 ? '+' : ''}₹{balance.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -284,11 +284,11 @@ const TripDetails = () => {
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Total spent:</span>
-                  <span className="font-medium">${balances.totalSpent.toFixed(2)}</span>
+                  <span className="font-medium">₹{balances.totalSpent.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Fair share:</span>
-                  <span className="font-medium">${balances.fairShare.toFixed(2)}</span>
+                  <span className="font-medium">₹{balances.fairShare.toFixed(2)}</span>
                 </div>
               </div>
             </motion.div>
