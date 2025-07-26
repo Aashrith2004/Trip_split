@@ -25,6 +25,18 @@ const Home = () => {
     }
   };
 
+  // Add delete handler
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this trip?')) return;
+    try {
+      await api.delete(`/api/trips/${id}`);
+      toast.success('Trip deleted!');
+      fetchTrips();
+    } catch (error) {
+      toast.error('Failed to delete trip');
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -128,45 +140,51 @@ const Home = () => {
                 whileHover={{ y: -5 }}
                 className="group"
               >
-                <Link to={`/trip/${trip._id}`}>
-                  <div className="card group-hover:shadow-glow cursor-pointer">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
-                        {trip.name}
-                      </h3>
-                      <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-primary-500 transition-colors" />
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Users className="h-4 w-4 mr-2" />
-                        <span>{trip.participants.length} participant{trip.participants.length !== 1 ? 's' : ''}</span>
+                <div className="relative">
+                  <Link to={`/trip/${trip._id}`}>
+                    <div className="card group-hover:shadow-glow cursor-pointer">
+                      <div className="flex items-start justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                          {trip.name}
+                        </h3>
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-primary-500 transition-colors" />
                       </div>
-                      
-                      <div className="flex items-center text-sm text-gray-600">
-                        <DollarSign className="h-4 w-4 mr-2" />
-                        <span>
-                          {trip.expenses.length} expense{trip.expenses.length !== 1 ? 's' : ''}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>
-                          {new Date(trip.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {trip.expenses.length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="text-sm text-gray-500">
-                          Total: ${trip.expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
+                      <div className="space-y-3">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Users className="h-4 w-4 mr-2" />
+                          <span>{trip.participants.length} participant{trip.participants.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <DollarSign className="h-4 w-4 mr-2" />
+                          <span>
+                            {trip.expenses.length} expense{trip.expenses.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          <span>
+                            {new Date(trip.createdAt).toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </Link>
+                      {trip.expenses.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="text-sm text-gray-500">
+                            Total: ${trip.expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                  {/* Delete button */}
+                  <button
+                    onClick={() => handleDelete(trip._id)}
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow transition-colors z-10"
+                    title="Delete trip"
+                  >
+                    &#10005;
+                  </button>
+                </div>
               </motion.div>
             ))}
           </div>
