@@ -169,7 +169,7 @@ const Home = () => {
                       {trip.expenses.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-gray-100">
                           <div className="text-sm text-gray-500">
-                            Total: ${trip.expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
+                            Total: ₹{trip.expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
                           </div>
                         </div>
                       )}
