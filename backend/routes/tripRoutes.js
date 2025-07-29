@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Trip = require("../models/Trip"); // <-- correct relative path to Trip.js
+const auth = require("../middleware/auth");
 
 // Create new trip
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   try {
     const { name, participants } = req.body;
     
@@ -23,6 +24,7 @@ router.post("/", async (req, res) => {
     }
     
     const trip = new Trip({ 
+      userId: req.user._id,
       name: name.trim(), 
       participants: validParticipants 
     });
@@ -35,9 +37,9 @@ router.post("/", async (req, res) => {
 });
 
 // Get all trips
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
-    const trips = await Trip.find();
+    const trips = await Trip.find({ userId: req.user._id });
     res.json(trips);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -45,7 +47,7 @@ router.get("/", async (req, res) => {
 });
 
 // Add an expense to a trip
-router.post("/:tripId/expenses", async (req, res) => {
+router.post("/:tripId/expenses", auth, async (req, res) => {
   try {
     const { tripId } = req.params;
     const { description, amount, paidBy } = req.body;
@@ -64,7 +66,9 @@ router.post("/:tripId/expenses", async (req, res) => {
     }
 
     const trip = await Trip.findById(tripId);
-    if (!trip) return res.status(404).json({ error: "Trip not found" });
+    if (!trip || trip.userId.toString() !== req.user._id.toString()) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
 
     // Check if payer is a participant
     if (!trip.participants.includes(paidBy.trim())) {
@@ -86,10 +90,12 @@ router.post("/:tripId/expenses", async (req, res) => {
 
 // Calculate balance for a trip
 // Calculate balances for a trip
-router.get("/:id/balances", async (req, res) => {
+router.get("/:id/balances", auth, async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
-    if (!trip) return res.status(404).json({ error: "Trip not found" });
+    if (!trip || trip.userId.toString() !== req.user._id.toString()) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
 
     const participants = trip.participants;
     const expenses = trip.expenses;
@@ -116,17 +122,19 @@ router.get("/:id/balances", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
-    if (!trip) return res.status(404).json({ error: "Trip not found" });
+    if (!trip || trip.userId.toString() !== req.user._id.toString()) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
     res.json(trip);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 // Update a specific expense in a trip
-router.put("/:tripId/expenses/:expenseIndex", async (req, res) => {
+router.put("/:tripId/expenses/:expenseIndex", auth, async (req, res) => {
   try {
     const { tripId, expenseIndex } = req.params;
     const { description, amount, paidBy } = req.body;
@@ -145,7 +153,9 @@ router.put("/:tripId/expenses/:expenseIndex", async (req, res) => {
     }
 
     const trip = await Trip.findById(tripId);
-    if (!trip) return res.status(404).json({ error: "Trip not found" });
+    if (!trip || trip.userId.toString() !== req.user._id.toString()) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
 
     if (!trip.expenses[expenseIndex])
       return res.status(404).json({ error: "Expense not found" });
@@ -168,12 +178,14 @@ router.put("/:tripId/expenses/:expenseIndex", async (req, res) => {
   }
 });
 // Delete a specific expense by index
-router.delete("/:tripId/expenses/:expenseIndex", async (req, res) => {
+router.delete("/:tripId/expenses/:expenseIndex", auth, async (req, res) => {
   try {
     const { tripId, expenseIndex } = req.params;
 
     const trip = await Trip.findById(tripId);
-    if (!trip) return res.status(404).json({ error: "Trip not found" });
+    if (!trip || trip.userId.toString() !== req.user._id.toString()) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
 
     if (!trip.expenses[expenseIndex])
       return res.status(404).json({ error: "Expense not found" });
@@ -188,14 +200,16 @@ router.delete("/:tripId/expenses/:expenseIndex", async (req, res) => {
 });
 
 // Add a participant to a trip
-router.post('/:id/participants', async (req, res) => {
+router.post('/:id/participants', auth, async (req, res) => {
   try {
     const { participant } = req.body;
     if (!participant || participant.trim() === "") {
       return res.status(400).json({ error: "Participant name is required" });
     }
     const trip = await Trip.findById(req.params.id);
-    if (!trip) return res.status(404).json({ error: "Trip not found" });
+    if (!trip || trip.userId.toString() !== req.user._id.toString()) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
 
     // Prevent duplicate participants
     if (trip.participants.includes(participant.trim())) {
@@ -211,12 +225,14 @@ router.post('/:id/participants', async (req, res) => {
 });
 
 // Delete a trip by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
-    const trip = await Trip.findByIdAndDelete(req.params.id);
-    if (!trip) {
+    const trip = await Trip.findById(req.params.id);
+    if (!trip || trip.userId.toString() !== req.user._id.toString()) {
       return res.status(404).json({ error: 'Trip not found' });
     }
+    
+    await Trip.findByIdAndDelete(req.params.id);
     res.json({ message: 'Trip deleted' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });

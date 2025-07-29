@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const tripRoutes = require("./routes/tripRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/trips", tripRoutes);
+app.use("/api/auth", authRoutes);
 
 // Connect to database on import
 connectDB();
